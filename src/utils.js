@@ -1,5 +1,5 @@
 ﻿(function(root, undefined) {
-	'use strict';
+
 
 	/**
 	 * @description Extended Object.keys
@@ -177,6 +177,23 @@
 	};
 
 	/**
+	 * @description Get Nonce String
+	 * @return {[String]} [Noce String]
+	 */
+	fn.getNonceStr = function(length) {
+		var len = length || 36;
+		return (Math.random().toString(36).substr(2, 100) + Math.random().toString(36).substr(2, 100)).slice(0, len);
+	};
+
+	/**
+	 * @description Get Times Tamp
+	 * @return {[Number]} [description]
+	 */
+	fn.getTimesTamp = function() {
+		return parseInt(new Date().getTime() / 1000) + '';
+	};
+
+	/**
 	 * @description Fix Number
 	 * @param  {[Number]} number [source number]
 	 * @param  {[Number]} length [string length]
@@ -199,5 +216,111 @@
 		return str.join('') + number;
 	};
 
-	root.utils = new Utils();
+	/**
+	 * @description get date string
+	 * @param  {[type]} date [description]
+	 * @return {[type]}      [description]
+	 */
+	fn.getDateString = function(date, time) {
+		var utils = Utils(),
+			fix = utils.fixNumber,
+			dateResult = [],
+			timeResult = [],
+			showTime = time === true ? true : false,
+			DATE = date ? new Date(date) : new Date();
+
+		fix.size = 2;
+
+		dateResult.push(DATE.getFullYear());
+		dateResult.push(fix(DATE.getMonth()));
+		dateResult.push(fix(DATE.getDate()));
+		if (showTime) {
+			timeResult.push(fix(DATE.getHours()));
+			timeResult.push(fix(DATE.getMinutes()));
+			timeResult.push(fix(DATE.getSeconds()));
+		}
+
+
+		return dateResult.join('-') + timeResult.join(':');
+	};
+
+	/**
+	 * @description color
+	 * @type {Object}
+	 */
+	var color = {
+		start: {
+			black: '\033[22;30m',
+			red: '\033[22;31m',
+			green: '\033[22;32m',
+			brown: '\033[22;33m',
+			blue: '\033[22;34m',
+			magenta: '\033[22;35m',
+			cyan: '\033[22;36m',
+			gray: '\033[22;37m',
+			darkGray: '\033[01;30m',
+			lightRed: '\033[01;31m',
+			lightGreen: '\033[01;32m',
+			yellow: '\033[01;33m',
+			lightBlue: '\033[01;34m',
+			lightMagenta: '\033[01;35m',
+			lightCyan: '\033[01;36m',
+			white: '\033[01;37m'
+		},
+		end: '\033[0m'
+	};
+	/**
+	 * [log description]
+	 * @param  {[type]} msg   [description]
+	 * @param  {[type]} color [description]
+	 * @return {[type]}       [description]
+	 */
+	function log() {
+		try {
+			console.log.apply(this, arguments);
+		} catch (ev) {}
+	}
+	fn.log = function(msg, style) {
+		log(color.start[style]);
+		log.call(this, msg, color.end);
+	};
+	fn.log.help = function() {
+		var utils = new Utils();
+		for (var key in color.start) {
+			utils.log(key, key);
+		}
+	};
+	fn.success = function() {
+		log(color.start.green);
+		log.apply(this, arguments);
+		log(color.end);
+	};
+	fn.error = function() {
+		log(color.start.red);
+		log.apply(this, arguments);
+		log(color.end);
+	};
+	fn.warn = function() {
+		log(color.start.yellow);
+		log.apply(this, arguments);
+		log(color.end);
+	};
+	fn.info = function() {
+		log(color.start.cyan);
+		log.apply(this, arguments);
+		log(color.end);
+	};
+
+	var utils = new Utils();
+
+	try {
+		module.exports = utils;
+	} catch (ev) {
+		if (root.module && root.module.exports) {
+			root.module.exports = utils;
+		} else {
+			root.utils = utils;
+		}
+	}
+
 })(this);
